@@ -4,30 +4,39 @@ import (
 	"log"
 	"os"
 	"main/DB"
-	"main/setting"
+//	"main/setting"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+
+//	"io/ioutil"
+//	"fmt"
+//	"encoding/json"
 )
 
 var router *gin.Engine
 
 func main() {
-	_, err := DB.ConnectWithDb()
+
+	db, err := DB.ConnectDB()
 	if err != nil {
 		log.Fatal(err)
 		os.Exit(1)
 	}
+	tables := []string{"order_meta", "delivery", "payment", "item"}
+//	fmt.Printf("Order: %+v\n", order)
 
-/*
-	DB.DropTable(db, "order_meta")
+	DB.DropTable(db, tables)
 	DB.CreateTables(db)
-	_, err = db.Exec(`INSERT INTO "order_meta" ("name") VALUES('AAAAAAQQQ')`)
-	if err != nil {
-	log.Fatal("main -> db.Exec: ", err)
-		os.Exit(1)
-	}
-	DB.PrintTable(db, "order_meta")
-*/
+//	DB.PrintTable(db, "order_meta")
+	DB.InsertDataInTable()
+
+//	return 
+
+//	DB.DecodeJsonToStruct()
+
+}	
+/*
+	 Работа с html
 
 	router = gin.Default()
 	router.Static("/qwe", setting.Config.HTML)
@@ -39,3 +48,4 @@ func main() {
 func index(c *gin.Context) {
 	c.HTML(200, "index.html", nil)
 }
+*/

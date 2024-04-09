@@ -8,7 +8,7 @@ import (
 
 var db *sql.DB
 
-func ConnectWithDb() (*sql.DB, error) {
+func ConnectDB() (*sql.DB, error) {
 	var err error
 	
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", setting.Config.PgUser, setting.Config.PgPassword, setting.Config.PgNameDB)

@@ -3,8 +3,10 @@ package DB
 import (
 	"fmt"
 	"database/sql"
+//	"encoding/json"
 	"log"
 	"os"
+	"io/ioutil"
 	_ "github.com/lib/pq"
 )
 
@@ -15,6 +17,7 @@ type Config struct {
 }
 
 func CreateTables(db *sql.DB) {
+/*
 	createOrder := `
 	CREATE TABLE IF NOT EXISTS order_meta (
 		name VARCHAR(30) NOT NULL 
@@ -25,9 +28,9 @@ func CreateTables(db *sql.DB) {
 		log.Fatal(err)
 		os.Exit(1)
 	}
+*/
 
 
-/*
 	createOrder := `
 	CREATE TABLE IF NOT EXISTS order_meta (
 		order_uid VARCHAR(24) PRIMARY KEY,
@@ -43,32 +46,69 @@ func CreateTables(db *sql.DB) {
 		oof_shard VARCHAR(255)
 	);`
 
+//		order_uid VARCHAR(24) PRIMARY KEY,
+//		FOREIGN KEY (order_uid) REFERENCES order_meta(order_uid),
 	createDelivery := `
 	CREATE TABLE IF NOT EXISTS delivery (
-		order_uid VARCHAR(24) PRIMARY KEY,
-		FOREIGN KEY (order_uid) REFERENCES order_meta(order_uid),
-		data_delivery JSON NOT NULL
+	   order_uid VARCHAR(24) REFERENCES order_meta(order_uid),
+	   name VARCHAR(30),
+	   phone VARCHAR(20),
+	   zip VARCHAR(100),
+	   city VARCHAR(30),
+	   address VARCHAR(100),
+	   region VARCHAR(50),
+	   email VARCHAR(30)
 	);`
+
+//		 order_uid VARCHAR(24) ,
+//		FOREIGN KEY (order_uid) REFERENCES order_meta(order_uid),
 
 		createPayment := `
 	CREATE TABLE IF NOT EXISTS payment (
-		order_uid VARCHAR(24) PRIMARY KEY,
-		FOREIGN KEY (order_uid) REFERENCES order_meta(order_uid),
-		data_payment JSON NOT NULL
+		order_uid VARCHAR(24) REFERENCES order_meta(order_uid),
+		  transaction VARCHAR(50),
+		  request_id VARCHAR(30),
+		  currency VARCHAR(50),
+		  provider VARCHAR(50),
+		  amount INT,
+		  payment_dt BIGINT,
+		  bank VARCHAR(50),
+		  delivery_cost INT,
+		  goods_total INT,
+		  custom_fee INT
+	);`
+	
+
+		createItem := `
+	CREATE TABLE IF NOT EXISTS item (
+		 chrt_id BIGSERIAL PRIMARY KEY,
+		 order_uid VARCHAR(50) REFERENCES order_meta(order_uid),
+		 track_number VARCHAR(30),
+		 price INT,
+		 rid VARCHAR(50),
+		 name VARCHAR(30),
+		 sale INT,
+		 size VARCHAR(30),
+		 total_price INT,
+		 nm_id INT,
+		 brand VARCHAR(30),
+		 status INT
 	);`
 
+
+/*
 	createItem := `
 	CREATE TABLE IF NOT EXISTS item (
 		id_item INTEGER PRIMARY KEY,
 		data_item JSON NOT NULL
 	);`
-
 	createOrderItem := `
 	CREATE TABLE IF NOT EXISTS order_item (
 		id_cart VARCHAR(24) REFERENCES order_meta(order_uid),
 		id_item INTEGER REFERENCES item(id_item),
 		PRIMARY KEY (id_cart, id_item)
 	);`
+*/
 
 //	tables := []string{"createOrder", "createDelivery", "createItem", "createPayment", "createOrderItem"}
 //	for _, table := range tables {
@@ -80,44 +120,82 @@ func CreateTables(db *sql.DB) {
 	_, err := db.Exec(createOrder)
 
 	if err != nil {
-		log.Fatal("CreateTabcles func :", err)
+		log.Fatal("CreateTabcles createOrder :", err)
 	}
 
 	_, err = db.Exec(createDelivery)
 
 	if err != nil {
-		log.Fatal("CreateTabcles func :", err)
+		log.Fatal("CreateTabcles createDelivery :", err)
 	}
 	
 	_, err = db.Exec(createItem)
 
 	if err != nil {
-		log.Fatal("CreateTabcles func :", err)
+		log.Fatal("CreateTabcles createItem :", err)
 	}
 	
 	_, err = db.Exec(createPayment)
 
 	if err != nil {
-		log.Fatal("CreateTabcles func :", err)
+		log.Fatal("CreateTabcles createPayment :", err)
 	}
 
+/*
 	_, err = db.Exec(createOrderItem)
 
 	if err != nil {
-		log.Fatal("CreateTabcles func :", err)
+		log.Fatal("CreateTabcles createOrderItem :", err)
 	}
 */
 }
 
-func DropTable(db *sql.DB, tableName string) {
+func DropTable(db *sql.DB, tables []string) {
 //	dropTable := "DROP TABLE IF EXISTS %s;"
 	dropTable := "DROP TABLE IF EXISTS %s CASCADE;"
+	for _, table := range tables {
+		query := fmt.Sprintf(dropTable, table)
+		_, err := db.Exec(query)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	
+/*
 	query := fmt.Sprintf(dropTable, tableName)
 
 	_, err := db.Exec(query)
 	if err != nil {
 		log.Fatal("DropTable: ", err)
 	}
+*/
+}
+
+
+func DecodeJsonToStruct() {
+	fileData, err := ioutil.ReadFile("model.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(fileData)
+/*
+	var root Root
+	err = json.Unmarshal([]byte(fileData), &root)
+	if err != nil {
+		log.Fatal("Unmarshal :", err)
+	}
+	fmt.Println(root)
+*/
+/*
+	file, err := os.Open("model.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	fileJsonValue, _ := ioutil.ReadAll(file)
+	fmt.Println(string(fileJsonValue))
+*/
 }
 
 func PrintTable(db *sql.DB, tableName string) {
