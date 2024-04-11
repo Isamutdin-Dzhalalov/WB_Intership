@@ -2,14 +2,15 @@ package main
 
 import (
 	"log"
-	"os"
+//	"os"
 	"main/DB"
 //	"main/setting"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+//	stan "github.com/nats-io/stan.go"
 
 //	"io/ioutil"
-//	"fmt"
+// 	"fmt"
 //	"encoding/json"
 )
 
@@ -20,15 +21,33 @@ func main() {
 	db, err := DB.ConnectDB()
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
-	tables := []string{"order_meta", "delivery", "payment", "item"}
-//	fmt.Printf("Order: %+v\n", order)
 
+
+	tables := []string{"order_meta", "delivery", "payment", "item"}
 	DB.DropTable(db, tables)
 	DB.CreateTables(db)
-//	DB.PrintTable(db, "order_meta")
 	DB.InsertDataInTable()
+
+/*
+	sc, err := stan.Connect("test-cluster", "test-client", stan.NatsURL("nats://localhost:4222"))
+	if err != nil {
+		log.Fatal("stan.Connect: ", err)
+	}
+	defer sc.Close()
+
+	_, err = sc.Subscribe("foo", func(msg *stan.Msg) {
+		DB.InsertDataInTable()
+	}, stan.StartWithLastReceived())
+//	select{}
+*/
+
+//	tables := []string{"order_meta", "delivery", "payment", "item"}
+//	fmt.Printf("Order: %+v\n", order)
+//	DB.DropTable(db, tables)
+//	DB.CreateTables(db)
+//	DB.PrintTable(db, "order_meta")
+//	DB.InsertDataInTable()
 
 //	return 
 

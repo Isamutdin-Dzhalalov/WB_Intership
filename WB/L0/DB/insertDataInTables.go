@@ -2,10 +2,11 @@ package DB
 
 import (
 //	"database/sql"
-//	"fmt"
+	"fmt"
 	"log"
 	"io/ioutil"
 	"encoding/json"
+	stan "github.com/nats-io/stan.go"
 )
 
 const (
@@ -27,6 +28,16 @@ const (
 )
 
 func InsertDataInTable() {
+
+	sc, err := stan.Connect("test-cluster", "test-client")
+	if err != nil {
+		log.Fatal("stan.Connect: ", err)
+	}
+	defer sc.Close()
+
+	fmt.Println("Error: ", err)
+	sub, err := sc.Subscribe("foo", func(msg *stan.Msg) {
+
 
 	file, err := ioutil.ReadFile("model.json")
 	if err != nil {
@@ -85,5 +96,8 @@ func InsertDataInTable() {
 	if err != nil {
 		log.Fatal("InsertDataInTable -> db.Exec payment: ", err)
 	}
-		
+	}, stan.StartWithLastReceived())
+	//sub.Unsubscribe()
+	fmt.Println(sub)
+	select{}	
 }

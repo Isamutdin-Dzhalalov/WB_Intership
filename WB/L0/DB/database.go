@@ -6,7 +6,7 @@ import (
 //	"encoding/json"
 	"log"
 	"os"
-	"io/ioutil"
+//	"io/ioutil"
 	_ "github.com/lib/pq"
 )
 
@@ -17,19 +17,6 @@ type Config struct {
 }
 
 func CreateTables(db *sql.DB) {
-/*
-	createOrder := `
-	CREATE TABLE IF NOT EXISTS order_meta (
-		name VARCHAR(30) NOT NULL 
-	);`
-
-	_, err := db.Exec(createOrder)
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-*/
-
 
 	createOrder := `
 	CREATE TABLE IF NOT EXISTS order_meta (
@@ -46,8 +33,6 @@ func CreateTables(db *sql.DB) {
 		oof_shard VARCHAR(255)
 	);`
 
-//		order_uid VARCHAR(24) PRIMARY KEY,
-//		FOREIGN KEY (order_uid) REFERENCES order_meta(order_uid),
 	createDelivery := `
 	CREATE TABLE IF NOT EXISTS delivery (
 	   order_uid VARCHAR(24) REFERENCES order_meta(order_uid),
@@ -59,9 +44,6 @@ func CreateTables(db *sql.DB) {
 	   region VARCHAR(50),
 	   email VARCHAR(30)
 	);`
-
-//		 order_uid VARCHAR(24) ,
-//		FOREIGN KEY (order_uid) REFERENCES order_meta(order_uid),
 
 		createPayment := `
 	CREATE TABLE IF NOT EXISTS payment (
@@ -95,21 +77,6 @@ func CreateTables(db *sql.DB) {
 		 status INT
 	);`
 
-
-/*
-	createItem := `
-	CREATE TABLE IF NOT EXISTS item (
-		id_item INTEGER PRIMARY KEY,
-		data_item JSON NOT NULL
-	);`
-	createOrderItem := `
-	CREATE TABLE IF NOT EXISTS order_item (
-		id_cart VARCHAR(24) REFERENCES order_meta(order_uid),
-		id_item INTEGER REFERENCES item(id_item),
-		PRIMARY KEY (id_cart, id_item)
-	);`
-*/
-
 //	tables := []string{"createOrder", "createDelivery", "createItem", "createPayment", "createOrderItem"}
 //	for _, table := range tables {
 //		_, err := db.Exec(table)
@@ -124,7 +91,6 @@ func CreateTables(db *sql.DB) {
 	}
 
 	_, err = db.Exec(createDelivery)
-
 	if err != nil {
 		log.Fatal("CreateTabcles createDelivery :", err)
 	}
@@ -140,14 +106,6 @@ func CreateTables(db *sql.DB) {
 	if err != nil {
 		log.Fatal("CreateTabcles createPayment :", err)
 	}
-
-/*
-	_, err = db.Exec(createOrderItem)
-
-	if err != nil {
-		log.Fatal("CreateTabcles createOrderItem :", err)
-	}
-*/
 }
 
 func DropTable(db *sql.DB, tables []string) {
@@ -172,21 +130,19 @@ func DropTable(db *sql.DB, tables []string) {
 }
 
 
+/*
 func DecodeJsonToStruct() {
 	fileData, err := ioutil.ReadFile("model.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(fileData)
-/*
 	var root Root
 	err = json.Unmarshal([]byte(fileData), &root)
 	if err != nil {
 		log.Fatal("Unmarshal :", err)
 	}
 	fmt.Println(root)
-*/
-/*
 	file, err := os.Open("model.json")
 	if err != nil {
 		log.Fatal(err)
@@ -195,8 +151,8 @@ func DecodeJsonToStruct() {
 
 	fileJsonValue, _ := ioutil.ReadAll(file)
 	fmt.Println(string(fileJsonValue))
-*/
 }
+*/
 
 func PrintTable(db *sql.DB, tableName string) {
 	sqlRequest := "SELECT * FROM %s "
