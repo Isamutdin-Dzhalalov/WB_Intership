@@ -8,6 +8,8 @@ import (
 	"os"
 //	"io/ioutil"
 	_ "github.com/lib/pq"
+
+//	stan "github.com/nats-io/stan.go"
 )
 
 type Config struct {
@@ -109,7 +111,7 @@ func CreateTables(db *sql.DB) {
 }
 
 func DropTable(db *sql.DB, tables []string) {
-//	dropTable := "DROP TABLE IF EXISTS %s;"
+
 	dropTable := "DROP TABLE IF EXISTS %s CASCADE;"
 	for _, table := range tables {
 		query := fmt.Sprintf(dropTable, table)
@@ -118,43 +120,10 @@ func DropTable(db *sql.DB, tables []string) {
 			log.Fatal(err)
 		}
 	}
+}
 	
-/*
-	query := fmt.Sprintf(dropTable, tableName)
-
-	_, err := db.Exec(query)
-	if err != nil {
-		log.Fatal("DropTable: ", err)
-	}
-*/
-}
-
-
-/*
-func DecodeJsonToStruct() {
-	fileData, err := ioutil.ReadFile("model.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(fileData)
-	var root Root
-	err = json.Unmarshal([]byte(fileData), &root)
-	if err != nil {
-		log.Fatal("Unmarshal :", err)
-	}
-	fmt.Println(root)
-	file, err := os.Open("model.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	fileJsonValue, _ := ioutil.ReadAll(file)
-	fmt.Println(string(fileJsonValue))
-}
-*/
-
 func PrintTable(db *sql.DB, tableName string) {
+
 	sqlRequest := "SELECT * FROM %s "
 	query := fmt.Sprintf(sqlRequest, tableName)
 

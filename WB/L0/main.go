@@ -1,20 +1,17 @@
 package main
 
 import (
+//	"fmt"
 	"log"
-//	"os"
 	"main/DB"
-//	"main/setting"
+//	"main/cache"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
-//	stan "github.com/nats-io/stan.go"
-
-//	"io/ioutil"
-// 	"fmt"
-//	"encoding/json"
+	  "github.com/rainycape/memcache"
 )
 
 var router *gin.Engine
+var mc *memcache.Client
 
 func main() {
 
@@ -28,33 +25,11 @@ func main() {
 	DB.DropTable(db, tables)
 	DB.CreateTables(db)
 	DB.InsertDataInTable()
-
-/*
-	sc, err := stan.Connect("test-cluster", "test-client", stan.NatsURL("nats://localhost:4222"))
-	if err != nil {
-		log.Fatal("stan.Connect: ", err)
-	}
-	defer sc.Close()
-
-	_, err = sc.Subscribe("foo", func(msg *stan.Msg) {
-		DB.InsertDataInTable()
-	}, stan.StartWithLastReceived())
-//	select{}
-*/
-
-//	tables := []string{"order_meta", "delivery", "payment", "item"}
-//	fmt.Printf("Order: %+v\n", order)
-//	DB.DropTable(db, tables)
-//	DB.CreateTables(db)
 //	DB.PrintTable(db, "order_meta")
-//	DB.InsertDataInTable()
-
-//	return 
-
-//	DB.DecodeJsonToStruct()
-
+//	cache.CacheData()
 }	
 /*
+
 	 Работа с html
 
 	router = gin.Default()
