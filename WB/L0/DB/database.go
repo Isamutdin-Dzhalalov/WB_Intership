@@ -79,34 +79,12 @@ func CreateTables(db *sql.DB) {
 		 status INT
 	);`
 
-//	tables := []string{"createOrder", "createDelivery", "createItem", "createPayment", "createOrderItem"}
-//	for _, table := range tables {
-//		_, err := db.Exec(table)
-//		if err != nil {
-//			log.Fatal("CReateTables func :", err)
-//		}
-//	}
-	_, err := db.Exec(createOrder)
-
-	if err != nil {
-		log.Fatal("CreateTabcles createOrder :", err)
-	}
-
-	_, err = db.Exec(createDelivery)
-	if err != nil {
-		log.Fatal("CreateTabcles createDelivery :", err)
-	}
-	
-	_, err = db.Exec(createItem)
-
-	if err != nil {
-		log.Fatal("CreateTabcles createItem :", err)
-	}
-	
-	_, err = db.Exec(createPayment)
-
-	if err != nil {
-		log.Fatal("CreateTabcles createPayment :", err)
+	tables := []string{createOrder, createDelivery, createItem, createPayment}
+	for _, table := range tables {
+		_, err := db.Exec(table)
+		if err != nil {
+			log.Fatal("CReateTables func -> table:", err)
+		}
 	}
 }
 

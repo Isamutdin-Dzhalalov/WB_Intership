@@ -1,7 +1,7 @@
 package DB
 
 import (
-	"fmt"
+//	"fmt"
 	"sync"
 )
 
@@ -20,7 +20,6 @@ func (c *Cache) Set(key string, value interface{}) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.data[key] = value
-//	fmt.Println(c.data[key])
 }
 
 func (c *Cache) Get(key string) (interface{}, bool) {
@@ -42,28 +41,9 @@ func (c *Cache) Clear() {
 	c.data = make(map[string]interface{})
 }
 
-func CacheData(order Order) {
+func CacheData(order Order) *Cache {
 	cache := NewCache()
 	cache.Set("order_meta", order)
-	fmt.Println()
-	fmt.Println(cache.data)
 
-/*
-	// Adding data to the cache
-	cache.Set("key1", "value1")
-	cache.Set("key2", 123)
-
-	// Retrieving data from the cache
-	if val, ok := cache.Get("key1"); ok {
-		fmt.Println("Value for key1:", val)
-	}
-
-	// Deleting data from the cache
-	cache.Delete("key2")
-
-	// Clearing the cache
-	cache.Clear()
-
-	time.Sleep(time.Second) // Sleep to allow cache operations to complete
-*/
+	return cache
 }

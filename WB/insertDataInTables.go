@@ -7,8 +7,9 @@ import (
 	"encoding/json"
 	stan "github.com/nats-io/stan.go"
 
-	"github.com/gin-gonic/gin"
+	"html/template"
 	"net/http"
+//	"main/web"
 )
 
 const (
@@ -47,9 +48,7 @@ func InsertDataInTable() {
 		log.Fatal("sc.Publish: ", err)
 	}
 
-	//	var order Order
-	cache := NewCache()
-	_, err = sc.Subscribe("foo", func(msg *stan.Msg) {
+	sub, err := sc.Subscribe("foo", func(msg *stan.Msg) {
 
 		log.Println("-------------------------")
 		log.Println("Connection NATS-streaming")
@@ -90,44 +89,61 @@ func InsertDataInTable() {
 			log.Fatal("InsertDataInTable -> db.Exec payment: ", err)
 		}
 
-		cache.data[order.OrderUID] = order
+
+ 	http.HandleFunc("/your_server_script.php", handleForm)
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        // Создаем мапу ключ-значение, где значения являются интерфейсами
+		cache := CacheData(order)
+		/*
+        data := map[string]interface{}{
+            "Ключ1": "Значение1",
+            "Ключ2": 123,
+            "Ключ3": struct{ Name string }{Name: "Значение3"},
+        }
+		*/
+
+        // Загружаем и разбираем шаблон
+    //    tmpl, err := template.ParseFiles("web/template.html")
+         tmpl, err := template.ParseFiles("web/userSearch.html")
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+
+        // Выполняем шаблон, передавая мапу в качестве данных
+        err = tmpl.Execute(w, *cache)
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+        }
+    })
+
+
 
 	}, stan.StartWithLastReceived())
-
-	r := gin.Default()
-		r.LoadHTMLFiles("web/userSearch.html")
-
-	r.GET("/", func(ctx *gin.Context) {
-		//id := ctx.Param("id")
-	ctx.HTML(http.StatusOK, "userSearch.html", nil)
-	})
-
-	r.POST("/search", func(c *gin.Context) {
-		searchTerm := c.PostForm("search")
-
-	if data, ok := cache.data[searchTerm]; ok {
-		fmt.Println("SERARC: ", searchTerm, data)
-		fmt.Println("SERARC: ", searchTerm)
-			// Если данные есть, преобразуем их в JSON и отправляем
-			resultJSON, err := json.MarshalIndent(data, "", "    ")
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			c.HTML(http.StatusOK, "userSearch.html", gin.H{
-				"data": string(resultJSON),
-			})
-		} else {
-			// Если данных нет, отправляем сообщение об ошибке
-			fmt.Println("ERREWRWERWERWER")
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"Данные клиента": cache.data[searchTerm],
-		})
-	})
-
-	r.Run(":8080")
-//	sub.Unsubscribe()
+	sub.Unsubscribe()
 	//select{}	
+    http.ListenAndServe(":8080", nil)
+}
+
+func handleForm(w http.ResponseWriter, r *http.Request) {
+    // Проверяем, что метод запроса является POST
+    if r.Method != http.MethodPost {
+        http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+        return
+    }
+
+    // Парсим данные формы
+    err := r.ParseForm()
+    if err != nil {
+        http.Error(w, "Ошибка при парсинге формы", http.StatusBadRequest)
+        return
+    }
+
+    // Получаем данные из формы
+    search := r.FormValue("search")
+
+    fmt.Printf("Вы искали: %s\n", search)
+    // Отправляем данные обратно клиенту
+    fmt.Fprintf(w, "Вы искали: %s", search)
 }
