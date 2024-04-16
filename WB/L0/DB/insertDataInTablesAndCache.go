@@ -1,12 +1,12 @@
 package DB
 
 import (
-	"log"
-	"encoding/json"
-	stan "github.com/nats-io/stan.go"
-	"github.com/gin-gonic/gin"
-	"net/http"
 	"database/sql"
+	"encoding/json"
+	"github.com/gin-gonic/gin"
+	stan "github.com/nats-io/stan.go"
+	"log"
+	"net/http"
 )
 
 const (
@@ -50,7 +50,7 @@ func InsertDataInTable(db *sql.DB) {
 		var order Order
 		err = json.Unmarshal([]byte(file), &order)
 		Error(err, "json.Unmarshal: ")
-	
+
 		db, err := ConnectDB()
 		Error(err, "ConnectDB: ")
 
@@ -58,24 +58,24 @@ func InsertDataInTable(db *sql.DB) {
 		orPay := order.Payment
 		orItem := order.Items[0]
 
-		_, err = db.Exec(insertOrderMeta, order.OrderUID, order.TrackNumber, order.Entry, order.Locale, order.InternalSignature, 
-		order.CustomerID, order.DeliveryService, order.ShardKey, order.SMID, order.DateCreated, order.OOFShard)
+		_, err = db.Exec(insertOrderMeta, order.OrderUID, order.TrackNumber, order.Entry, order.Locale, order.InternalSignature,
+			order.CustomerID, order.DeliveryService, order.ShardKey, order.SMID, order.DateCreated, order.OOFShard)
 		Error(err, "db.Exes order: ")
 
 		_, err = db.Exec(insertDelivery, orDel.Name, orDel.Phone, orDel.Zip, orDel.City, orDel.Address, orDel.Region, orDel.Email)
 		Error(err, "db.Exes delivery: ")
 
-		_, err = db.Exec(insertPayment, orPay.Transaction, orPay.RequestID, orPay.Currency, orPay.Provider, orPay.Amount, 
-		orPay.PaymentDT, orPay.Bank, orPay.DeliveryCost, orPay.GoodsTotal, orPay.CustomFee) 
+		_, err = db.Exec(insertPayment, orPay.Transaction, orPay.RequestID, orPay.Currency, orPay.Provider, orPay.Amount,
+			orPay.PaymentDT, orPay.Bank, orPay.DeliveryCost, orPay.GoodsTotal, orPay.CustomFee)
 		Error(err, "db.Exes payment: ")
-			
-		_, err = db.Exec(insertItem, orItem.ChrtID, orItem.TrackNumber, orItem.Price, orItem.RID, orItem.Name, orItem.Sale, 
-		orItem.Size, orItem.TotalPrice, orItem.NMID, orItem.Brand, orItem.Status)
+
+		_, err = db.Exec(insertItem, orItem.ChrtID, orItem.TrackNumber, orItem.Price, orItem.RID, orItem.Name, orItem.Sale,
+			orItem.Size, orItem.TotalPrice, orItem.NMID, orItem.Brand, orItem.Status)
 		Error(err, "db.Exes item: ")
 
-	cache = InsertDataToCache(db)
+		cache = InsertDataToCache(db)
 
-		}, stan.StartWithLastReceived())
+	}, stan.StartWithLastReceived())
 
 	r := gin.Default()
 	r.LoadHTMLFiles("web/userSearch.html")
@@ -100,7 +100,7 @@ func InsertDataInTable(db *sql.DB) {
 
 		} else {
 			c.HTML(http.StatusOK, "userSearch.html", gin.H{})
-			 c.String(http.StatusOK, "Данные по указанному ID не найдены")
+			c.String(http.StatusOK, "Данные по указанному ID не найдены")
 		}
 	})
 
@@ -119,8 +119,8 @@ func InsertDataToCache(db *sql.DB) *Cache {
 	i := 0
 	for rows.Next() {
 		var order Order
-		if err := rows.Scan(&order.OrderUID, &order.TrackNumber, &order.Entry, &order.Locale, &order.InternalSignature, 
-		&order.CustomerID, &order.DeliveryService, &order.ShardKey, &order.SMID, &order.DateCreated, &order.OOFShard); err != nil {
+		if err := rows.Scan(&order.OrderUID, &order.TrackNumber, &order.Entry, &order.Locale, &order.InternalSignature,
+			&order.CustomerID, &order.DeliveryService, &order.ShardKey, &order.SMID, &order.DateCreated, &order.OOFShard); err != nil {
 			log.Fatal(err)
 		}
 		orders = append(orders, order)

@@ -1,16 +1,16 @@
 package DB
 
 import (
-	"fmt"
 	"database/sql"
-	"log"
+	"fmt"
 	_ "github.com/lib/pq"
+	"log"
 )
 
 type Config struct {
-	User string
+	User     string
 	Password string
-	Dbname string
+	Dbname   string
 }
 
 func CreateTables(db *sql.DB) {
@@ -42,7 +42,7 @@ func CreateTables(db *sql.DB) {
 	   email VARCHAR(30)
 	);`
 
-		createPayment := `
+	createPayment := `
 	CREATE TABLE IF NOT EXISTS payment (
 		order_uid VARCHAR(24) REFERENCES order_meta(order_uid),
 		  transaction VARCHAR(50),
@@ -56,9 +56,8 @@ func CreateTables(db *sql.DB) {
 		  goods_total BIGINT,
 		  custom_fee BIGINT
 	);`
-	
 
-		createItem := `
+	createItem := `
 	CREATE TABLE IF NOT EXISTS item (
 		 chrt_id BIGSERIAL PRIMARY KEY,
 		 order_uid VARCHAR(50) REFERENCES order_meta(order_uid),
