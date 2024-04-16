@@ -1,12 +1,20 @@
 package DB
 
+import (
+	"log"
+    "time"
+	"encoding/json"
+    "github.com/brianvoe/gofakeit/v7"
+)
+	
+
 type Order struct {
-	OrderUID       string      `json:"order_uid"`
+	OrderUID       string      `json:"order_uid" fake:"{uuid}"`
 	TrackNumber    string      `json:"track_number"`
 	Entry          string      `json:"entry"`
 	Delivery       Delivery    `json:"delivery"`
 	Payment        Payment     `json:"payment"`
-	Items          []Item      `json:"items"`
+	Items          [1]Item      `json:"items"`
 	Locale         string      `json:"locale"`
 	InternalSignature string `json:"internal_signature"`
 	CustomerID     string      `json:"customer_id"`
@@ -53,3 +61,22 @@ type Item struct {
 	Brand         string `json:"brand"`
 	Status        int    `json:"status"`
 }
+
+func DataGeneration() []uint8 {
+    gofakeit.Seed(time.Now().UnixNano())
+
+    var order Order
+
+    err := gofakeit.Struct(&order)
+    if err != nil {
+		log.Fatal(err)
+    }
+
+    jsonData, err := json.MarshalIndent(order, "", " ")
+    if err != nil {
+		log.Fatal(err)
+    }
+
+	return jsonData
+}
+

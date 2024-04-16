@@ -3,13 +3,8 @@ package DB
 import (
 	"fmt"
 	"database/sql"
-//	"encoding/json"
 	"log"
-	"os"
-//	"io/ioutil"
 	_ "github.com/lib/pq"
-
-//	stan "github.com/nats-io/stan.go"
 )
 
 type Config struct {
@@ -22,7 +17,7 @@ func CreateTables(db *sql.DB) {
 
 	createOrder := `
 	CREATE TABLE IF NOT EXISTS order_meta (
-		order_uid VARCHAR(24) PRIMARY KEY,
+		order_uid VARCHAR(240) PRIMARY KEY,
 		track_number VARCHAR(255) NOT NULL,
 		entry VARCHAR(255) NOT NULL,
 		locale VARCHAR(255),
@@ -30,7 +25,7 @@ func CreateTables(db *sql.DB) {
 		customer_id VARCHAR(255) NOT NULL,
 		delivery_service VARCHAR(255),
 		shardkey VARCHAR(255),
-		sm_id INT,
+		sm_id BIGINT,
 		date_created VARCHAR(255),
 		oof_shard VARCHAR(255)
 	);`
@@ -54,12 +49,12 @@ func CreateTables(db *sql.DB) {
 		  request_id VARCHAR(30),
 		  currency VARCHAR(50),
 		  provider VARCHAR(50),
-		  amount INT,
+		  amount BIGINT,
 		  payment_dt BIGINT,
 		  bank VARCHAR(50),
-		  delivery_cost INT,
-		  goods_total INT,
-		  custom_fee INT
+		  delivery_cost BIGINT,
+		  goods_total BIGINT,
+		  custom_fee BIGINT
 	);`
 	
 
@@ -68,15 +63,15 @@ func CreateTables(db *sql.DB) {
 		 chrt_id BIGSERIAL PRIMARY KEY,
 		 order_uid VARCHAR(50) REFERENCES order_meta(order_uid),
 		 track_number VARCHAR(30),
-		 price INT,
+		 price BIGINT,
 		 rid VARCHAR(50),
 		 name VARCHAR(30),
-		 sale INT,
+		 sale BIGINT,
 		 size VARCHAR(30),
-		 total_price INT,
-		 nm_id INT,
+		 total_price BIGINT,
+		 nm_id BIGINT,
 		 brand VARCHAR(30),
-		 status INT
+		 status BIGINT
 	);`
 
 	tables := []string{createOrder, createDelivery, createItem, createPayment}
@@ -99,56 +94,3 @@ func DropTable(db *sql.DB, tables []string) {
 		}
 	}
 }
-	
-func PrintTable(db *sql.DB, tableName string) {
-
-	sqlRequest := "SELECT * FROM %s "
-	query := fmt.Sprintf(sqlRequest, tableName)
-
-	rows, err := db.Query(query)
-	if err != nil {
-		log.Fatal("PrintTable func -> rows ", err)
-		os.Exit(1)
-	}
-	defer rows.Close()
-
-	columns, err := rows.Columns()
-	if err != nil {
-		log.Fatal("PrintTable func -> columns: ", err)
-	}
-
-		// Создание слайса для хранения значений каждой строки
-	values := make([]interface{}, len(columns))
-	scanArgs := make([]interface{}, len(values))
-
-	// Заполнение слайса значениями для сканирования
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	// Вывод данных
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		if err != nil {
-			log.Fatal("PrintTable func -> for cicle :", err)
-		}
-
-		// Вывод значений каждой строки
-		var value string
-		for i, col := range values {
-			if col != nil {
-				value = fmt.Sprintf("%s", col)
-			} else {
-				value = "NULL"
-			}
-			fmt.Printf("%s: %s\n", columns[i], value)
-		}
-		fmt.Println("---")
-	}
-
-	if err = rows.Err(); err != nil {
-		log.Fatal("PrintTable func -> rows.Err: ", err)
-	}
-}
-
-
