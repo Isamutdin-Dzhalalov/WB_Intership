@@ -36,14 +36,6 @@ func main() {
 
 func readChan(chanUser <-chan int) {
 	for out := range chanUser {
-//	for {
-/*
-		out, ok := <-chanUser
-		// Если канал закрыт - выходим из цикла.
-		if !ok {
-			break
-		}
-*/
 		fmt.Println(out)
 	}
 }
