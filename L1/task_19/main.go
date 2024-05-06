@@ -31,18 +31,3 @@ func main() {
 	fmt.Println(result)
 }
 
-/*
-
-package main
-
-import (
-    "fmt"
-    "github.com/rivo/uniseg"
-)
-
-func main() {
-    str := "главрыба — абырвалг"
-    reversed := uniseg.ReverseString(str)
-    fmt.Println(reversed)
-}
-
