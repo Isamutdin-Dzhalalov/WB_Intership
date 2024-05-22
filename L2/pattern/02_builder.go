@@ -1,71 +1,69 @@
+/*
+
+
+
 package main
 
 import "fmt"
 
-// Product
+// Продукт, который мы создаем.
 type House struct {
-    windows string
-    doors   string
+    walls   string
     roof    string
+    windows string
 }
 
-// Builder interface
+// Интерфейс Строителя, с методами построения и получения готового дома.
 type HouseBuilder interface {
-    SetWindows() HouseBuilder
-    SetDoors() HouseBuilder
-    SetRoof() HouseBuilder
-    Build() House
+    BuildWalls()
+    BuildRoof()
+    BuildWindows()
+    GetHouse() House
 }
 
-type ConcreteHouseBuilder struct {
-	house House
+// Конкретный строитель для деревянного дома.
+type WoodenHouseBuilder struct {
+    house House
 }
 
-func NewConcreteHouseBuilder() *ConcreteHouseBuilder {
-    return &ConcreteHouseBuilder{}
+func (b *WoodenHouseBuilder) BuildWalls() {
+    b.house.walls = "Wooden Walls"
 }
 
-func (b *ConcreteHouseBuilder) SetWindows() HouseBuilder {
-    b.house.windows = "wooden windows"
-    return b
+func (b *WoodenHouseBuilder) BuildRoof() {
+    b.house.roof = "Wooden Roof"
 }
 
-func (b *ConcreteHouseBuilder) SetDoors() HouseBuilder {
-    b.house.doors = "wooden doors"
-    return b
+func (b *WoodenHouseBuilder) BuildWindows() {
+    b.house.windows = "Wooden Windows"
 }
 
-func (b *ConcreteHouseBuilder) SetRoof() HouseBuilder {
-    b.house.roof = "tile roof"
-    return b
-}
-
-func (b *ConcreteHouseBuilder) Build() House {
+func (b *WoodenHouseBuilder) GetHouse() House {
     return b.house
 }
 
-// Director
+// Управление процессом строительства.
 type Director struct {
     builder HouseBuilder
 }
 
-func NewDirector(b HouseBuilder) *Director {
-    return &Director{
-        builder: b,
-    }
+// Вызываем методы.
+func (d *Director) Construct() {
+    d.builder.BuildWalls()
+    d.builder.BuildRoof()
+    d.builder.BuildWindows()
 }
 
-func (d *Director) Construct() House {
-    return d.builder.SetWindows().SetDoors().SetRoof().Build()
+func NewDirector(builder HouseBuilder) *Director {
+    return &Director{builder: builder}
 }
 
-func (h *House) Show() {
-    fmt.Printf("House with %s, %s, and %s roof\n", h.windows, h.doors, h.roof)
-}
 func main() {
-    builder := NewConcreteHouseBuilder()
-    director := NewDirector(builder)
-    house := director.Construct()
-    house.Show()
+    woodenBuilder := &WoodenHouseBuilder{}
+    director := NewDirector(woodenBuilder)
+    director.Construct()
+
+    house := woodenBuilder.GetHouse()
+    fmt.Printf("House built with: %s, %s, %s\n", house.walls, house.roof, house.windows)
 }
 
